@@ -1,13 +1,25 @@
-import { test as setup, expect } from '@playwright/test';
+import { test as setup, expect, Browser, Page, chromium, FullConfig } from '@playwright/test';
 
-const golbalAuth = './.auth/global_auth.json'
+async function globalSetup(config: FullConfig) {
 
-setup('Authenticate Once', async ({ page, baseURL }) => {
+    const { baseURL, storageState } = config.projects[0].use;
+    const browser: Browser = await chromium.launch({
+        headless: true,
+        timeout: 1000
+    });
+    const context = await browser.newContext();
+    const page: Page = await context.newPage();
+
     await page.goto(baseURL + "/login");
     await page.getByPlaceholder('UserName', { exact: true }).fill(process.env.USERNAME!);
     await page.getByPlaceholder('Password', { exact: true }).fill(process.env.PASSWORD!);
     await page.locator("#login").click();
-    await page.waitForURL(baseURL + '/profile');
     await expect(page.locator("#userName-value")).toHaveText(process.env.USERNAME!);
-    await page.context().storageState({ path: golbalAuth });
-});
+
+    await page.context().storageState({ path: storageState as string});
+
+    await browser.close();
+    
+}
+
+export default globalSetup;

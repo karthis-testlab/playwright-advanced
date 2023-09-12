@@ -12,6 +12,7 @@ require('dotenv').config();
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  globalSetup: "./setups/global-setup",
   testDir: './tests/advanced-examples',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -31,26 +32,15 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
     headless: false,
-    baseURL: "https://demoqa.com"
+    baseURL: "https://demoqa.com",
+    storageState: "./.auth/global_auth.json"
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'global-setup',
-      testDir: './setups',
-      testMatch: 'global-setup.ts',
-      use: {
-        headless: true
-      }
-    },
+  projects: [    
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: "./.auth/global_auth.json"
-      },
-      dependencies: ["global-setup"]
+      use: { ...devices['Desktop Chrome'] }
     },
 
     {
